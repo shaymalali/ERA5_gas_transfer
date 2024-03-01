@@ -1,4 +1,4 @@
-function [kw,Sc]=calcTransferVelocity3(era,K0)
+function [kw]=calcTransferVelocity3(era,K0,Sc)
 %Use function to calculate the gas transfer velocity 
 %Calculation is based on Reichl and Deike (2020)
 
