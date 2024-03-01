@@ -69,7 +69,7 @@ for i=1:length(direc_swh)
     era_ocean.swh=ncread(fname_swh,'swh');
     era_ocean.lat=ncread(fname_swh,'latitude');
     era_ocean.lon=ncread(fname_swh,'longitude');
-    era_ocean.sst=ncread(fname_sst,'sst');
+    era_atmo.sst=ncread(fname_sst,'sst'); %ocean product but data is in atmospheric grid
     era_ocean.time=ncread(fname_swh,'time');
     %load in the atmospheric data
     fname_ustar=direc_ustar(i).name;
@@ -93,13 +93,16 @@ for i=1:length(direc_swh)
     for j=1:size(era_atmo.ustar,3)
         V=era_atmo.ustar(:,:,j);
         V2=era_atmo.wspd(:,:,j);
+        V3=era_atmo.sst(:,:,j);
         era_ocean.ustar(:,:,j)=interp2(era_atmo.lat,era_atmo.lon,V,X,Y);
-        era_ocean.wspd(:,:,j)=interp2(era_atmo.lat,era_atmo.lon,V,X,Y);
+        era_ocean.wspd(:,:,j)=interp2(era_atmo.lat,era_atmo.lon,V2,X,Y);
+        era_ocean.sst(:,:,j)=interp2(era_atmo.lat,era_atmo.lon,V3,X,Y);
     end
 
       %apply land mask to ustar and u10
       era_ocean.ustar(isnan(era_ocean.swh))=NaN;
       era_ocean.wspd(isnan(era_ocean.swh))=NaN;
+      era_ocean.sst(isnan(era_ocean.swh))=NaN;
 
       %calculate the solubility for the Reichl and Deike (2020)
       %Parameterizations
