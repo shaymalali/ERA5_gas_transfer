@@ -23,22 +23,22 @@ if flag == 0
    
    	load(direc_90s(i).name)
     	kw_90=kw_monthmean;
-        a=kw_90.NB;
-        a2=kw_90.B;
+        a=kw_90.kwnb;
+        a2=kw_90.kwb;
         a3=kw_90.wan;
        
 
     	load(direc_2000s(i).name)
     	kw_2000=kw_monthmean;
-    	b=kw_2000.NB;
-        b2=kw_2000.B;
+    	b=kw_2000.kwnb;
+        b2=kw_2000.kwb;
         b3=kw_2000.wan;
        
 
     	load(direc_2010s(i).name)
     	kw_2010=kw_monthmean;
-    	c=kw_2010.NB;
-        c2=kw_2010.B;
+    	c=kw_2010.kwnb;
+        c2=kw_2010.kwb;
         c3=kw_2010.wan;
 
     %concatenate the transfer velocities
