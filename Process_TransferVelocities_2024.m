@@ -111,7 +111,7 @@ for i=1:length(direc_swh)
       %Calculate the Schmidt Number (Sc) for both parameterizations
       %Sc is calculated using the Wanninkhof(2014) calculations 
       %Sc=A+Bt+Ct^2+Dt^3+Et^4 where t is SST in C
-      for i=1:length(era_ocean.swh,3)
+      for i=1:size(era_ocean.swh,3)
           k=era_ocean.sst(:,:,i);
 
           A= 2116.8;
