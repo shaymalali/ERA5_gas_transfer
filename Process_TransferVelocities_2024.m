@@ -106,7 +106,7 @@ for i=1:length(direc_swh)
 
     %calculate the solubility for the Reichl and Deike (2020)
     %Parameterizations
-    [K0]=calcSolubility3(era_ocean,SSS);
+    [K01]=calcSolubility3(era_ocean,SSS);
 
     %Calculate the Schmidt Number (Sc) for both parameterizations
     %Sc is calculated using the Wanninkhof(2014) calculations 
