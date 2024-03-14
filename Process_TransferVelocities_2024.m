@@ -99,62 +99,61 @@ for i=1:length(direc_swh)
         era_ocean.sst(:,:,j)=interp2(era_atmo.lat,era_atmo.lon,V3,X,Y);
     end
 
-      %apply land mask to ustar and u10
-      era_ocean.ustar(isnan(era_ocean.swh))=NaN;
-      era_ocean.wspd(isnan(era_ocean.swh))=NaN;
-      era_ocean.sst(isnan(era_ocean.swh))=NaN;
+    %apply land mask to ustar and u10
+    era_ocean.ustar(isnan(era_ocean.swh))=NaN;
+    era_ocean.wspd(isnan(era_ocean.swh))=NaN;
+    era_ocean.sst(isnan(era_ocean.swh))=NaN;
 
-      %calculate the solubility for the Reichl and Deike (2020)
-      %Parameterizations
-      [K01]=calcSolubility3(era_ocean,SSS);
+    %calculate the solubility for the Reichl and Deike (2020)
+    %Parameterizations
+    [K0]=calcSolubility3(era_ocean,SSS);
 
-      %Calculate the Schmidt Number (Sc) for both parameterizations
-      %Sc is calculated using the Wanninkhof(2014) calculations 
-      %Sc=A+Bt+Ct^2+Dt^3+Et^4 where t is SST in C
-      for i=1:size(era_ocean.swh,3)
-          k=era_ocean.sst(:,:,i);
+    %Calculate the Schmidt Number (Sc) for both parameterizations
+    %Sc is calculated using the Wanninkhof(2014) calculations 
+    %Sc=A+Bt+Ct^2+Dt^3+Et^4 where t is SST in C
+    for j=1:size(era_ocean.swh,3)
+       t=era_ocean.sst(:,:,j);
 
-          A= 2116.8;
-          B=(-136.25).*(k);
-          C=4.7353*((k).^2);
-          D=(-0.092307)*((k).^3);
-          E=0.000755*((k).^4);
+       A= 2116.8;
+       B=(-136.25).*(t);
+       C=4.7353*((t).^2);
+       D=(-0.092307)*((t).^3);
+       E=0.000755*((t).^4);
+       
+       Sc(:,:,j)=A+B+C+D+E;
+    end
 
-          kk=A+B+C+D+E;
-          Sc(:,:,i)=kk;
-      end
+    %calculate the bubble and non-bubble transfer velocities using the
+    %Reichl & Deike (2020) Parameterizations
 
-     %calculate the bubble and non-bubble transfer velocities using the
-     %Reichl & Deike (2020) Parameterizations
+    %These calculations will NOT include the dimensional fitting
+    %coefficients found in R&D (2020) paper but will be included in
+    %further codes
 
-     %These calculations will NOT include the dimensional fitting
-     %coefficients found in R&D (2020) paper but will be included in
-     %further codes
+    [Kw]=calcTransferVelocity3(era_ocean,K0,Sc);
+    %Kw is a structure where:
+    %Kw.NB is the non-bubble portion
+    %Kw.B is the bubble portion
 
-     [Kw]=calcTransferVelocity3(era_ocean,K0,Sc);
-     %Kw is a structure where:
-     %Kw.NB is the non-bubble portion
-     %kw.B is the bubble portion
-
-     %calculate the Wanninkhof (2014) transfer velocities
-     %These calculations will NOT include the fitting coefficient 
-     [Kw_Wan]=calcWankw(era_ocean,Sc);
+    %calculate the Wanninkhof (2014) transfer velocities
+    %These calculations will NOT include the fitting coefficient 
+    [Kw_Wan]=calcWankw(era_ocean,Sc);
      
-     %calculate the monthly mean of the transfer velocities
-     kw_monthmean.kwnb(:,:,i)=mean(kw.NB,3,"omitnan");
-     kw_monthmean.kwb(:,:,i)=mean(kw.B,3,"omitnan");
-     kw_monthmean.wan(:,:,i)=mean(Kw_Wan,3,"omitnan");
-     kw_monthmean.lat=era_ocean.lat;
-     kw_monthmean.lon=era_ocean.lon;
-     kw_monthmean.dt(i)=datetime(year(era_ocean.dt(1)),month(era_ocean(1)),1);
+    %calculate the monthly mean of the transfer velocities
+    kw_monthmean.kwnb(:,:,i)=mean(kw.NB,3,"omitnan");
+    kw_monthmean.kwb(:,:,i)=mean(kw.B,3,"omitnan");
+    kw_monthmean.wan(:,:,i)=mean(Kw_Wan,3,"omitnan");
+    kw_monthmean.lat=era_ocean.lat;
+    kw_monthmean.lon=era_ocean.lon;
+    kw_monthmean.dt(i)=datetime(year(era_ocean.dt(1)),month(era_ocean(1)),1);
   
-     waveparams.meanswh(:,:,i)=mean(era_ocean.swh,3,"omitnan");
-     waveparams.stdswh(:,:,i)=std(era_ocean.swh,0,3);
-     waveparams.meanu(:,:,i)=mean(era_ocean.ustar,3,"omitnan");
-     waveparams.stdu(:,:,i)=std(era_ocean.ustar,0,3);
-     waveparams.meanu10(:,:,i)=mean(era_ocean.u10,3,"omitnan");
-     waveparams.meanSc(:,:,i)=mean(Sc,3,"omitnan");
+    waveparams.meanswh(:,:,i)=mean(era_ocean.swh,3,"omitnan");
+    waveparams.stdswh(:,:,i)=std(era_ocean.swh,0,3);
+    waveparams.meanu(:,:,i)=mean(era_ocean.ustar,3,"omitnan");
+    waveparams.stdu(:,:,i)=std(era_ocean.ustar,0,3);
+    waveparams.meanu10(:,:,i)=mean(era_ocean.u10,3,"omitnan");
+    waveparams.meanSc(:,:,i)=mean(Sc,3,"omitnan");
 
-     clear era_ocea era_atmo Sc
+    clear era_ocea era_atmo Sc
 end
 save('ERA_Hour_Data1990.mat','kw_monthmean','waveparams');
